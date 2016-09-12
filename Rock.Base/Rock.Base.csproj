@@ -1,0 +1,414 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{79FC0045-B92E-4A56-9FEC-E5F970BDAD65}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Rock.Base</RootNamespace>
+    <AssemblyName>Rock.Base</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Class1.cs" />
+    <Compile Include="DataAccess\BaseDBContext.cs" />
+    <Compile Include="EAction.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="EActionFormConfig.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="EActionPushConfig.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="EActionPushDynamicRole.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="EActionPushMsgParams.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="EActionShowConfig.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="EActionSwitch.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="EInstance.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="EInstanceAudit.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="EInstanceLog.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="EInstanceProgress.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Customer.cs" />
+    <Compile Include="EPushGroup.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="EPushGroupUser.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="EState.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="EStateShowConfig.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="EWorkflow.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="EWorkflowUse.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="t_ad.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_address.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_ad_setting.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_agreement_agent.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_agreement_pay.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_anonymous.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_app_log.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_buglst.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_Channel.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_codeIndex.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_customs_fee.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_DicRegion.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_dict.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_emblem_setting.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_enterprise.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_events.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_event_signup.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_exchange_records.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_FriendGroup.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_friendIndex.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_guestBook.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_importdeclaration.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_importdeclaration_items.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_importtariff.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_importtariff_items.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_inbox.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_Inquiry_Apply.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_Inquiry_ApplyAttr.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_Inquiry_Collection.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_Inquiry_Config.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_Inquiry_Offer.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_Inquiry_SerialNumber.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_invoice.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_lc_Rate.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_lc_setting.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_lc_Sheet.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_log.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_message.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_messageJobs.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_msg_sc.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_online.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_orders.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_OrderTest.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_page.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_pay_info.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_pay_log.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_Permission.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_platform_collectmenu.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_platform_menu.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_platform_menutype.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_product.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_product_snap.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_Qc.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_receiptNotification.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_receiptNotificiation_items.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_RecentContact.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_register.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_Rights.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_RoleList.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_savedec_log.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_sensitiveWord.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_sheetPic.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_sms_log.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_systemSetting.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_vat.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_vat_items.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_wantbuy.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_wantbuy_collect.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_wantbuy_offer.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_workflow.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_workflow_log.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t_workflow_setting.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="v_buyer.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="v_friends.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="v_lcmaker.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="v_LcRateClients.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="v_LcRateOwn.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="v_Licence.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="v_orders.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="v_platform.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="v_Qc.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="v_seller.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="v_wf_log.cs">
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="YarnTradeDB.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>YarnTradeDB.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="YarnTradeDB.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>YarnTradeDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="YarnTradeDB.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>YarnTradeDB.edmx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+    <EntityDeploy Include="YarnTradeDB.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>YarnTradeDB.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="YarnTradeDB.edmx.diagram">
+      <DependentUpon>YarnTradeDB.edmx</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="YarnTradeDB.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>YarnTradeDB.edmx</DependentUpon>
+      <LastGenOutput>YarnTradeDB.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="YarnTradeDB.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>YarnTradeDB.edmx</DependentUpon>
+      <LastGenOutput>YarnTradeDB.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Rock.Framework\Rock.Framework.csproj">
+      <Project>{4aa9a160-d67d-4632-96c2-88f908705a1c}</Project>
+      <Name>Rock.Framework</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
