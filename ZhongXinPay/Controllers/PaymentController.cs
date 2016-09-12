@@ -20,9 +20,9 @@ namespace ZhongXinPay.Controllers
         // GET: Payment
         public ActionResult Index()
         {
-            BaseDBContext db = new BaseDBContext(ConfigurationManager.ConnectionStrings["ROCKConnDebug"].ToString());
+            BaseDBContext db = new BaseDBContext(ConfigurationManager.ConnectionStrings["ROCKConnDebugPic"].ToString());
             //db.ExecuteSQL("");
-            t_enterprise entity = db.FindEntity<t_enterprise>(1, "e_id");
+            
             return View();
         }
 

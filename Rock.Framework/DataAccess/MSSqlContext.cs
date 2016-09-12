@@ -165,6 +165,7 @@ namespace Rock.Framework.DataAccess
 
         public int InsertEntity<T>(T entity)
         {
+
             throw new NotImplementedException();
         }
 
