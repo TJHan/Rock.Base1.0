@@ -12,6 +12,7 @@ using System.Data;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
+
 namespace Rock.Framework.DataAccess
 {
     public class MSSqlContext : DbContext, IDbContext
@@ -163,20 +164,94 @@ namespace Rock.Framework.DataAccess
             return FindByFilter<T>(sql, para).FirstOrDefault();
         }
 
+        /// <summary>
+        /// 添加实体的数据到数据库
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="entity">插入DB的实体类对象</param>
+        /// <returns></returns>
         public int InsertEntity<T>(T entity)
         {
+            Type tType = entity.GetType();
+            PropertyInfo[] propList = tType.GetProperties();
 
-            throw new NotImplementedException();
+            string sql = string.Format(@"INSERT INTO {0} (", tType.Name);
+            propList = propList.Where(d => d.GetCustomAttribute<Attributes.PrimaryKeyAttribute>(true) == null).ToArray();
+            string[] columnNameList = propList.Select(p => p.Name).ToArray();
+            string[] paraList = propList.Select(p => string.Format(@"@{0}", p.Name)).ToArray();
+            Dictionary<string, object> paraDict = new Dictionary<string, object>();
+
+            propList.ToList().ForEach(d =>
+            {
+                paraDict.Add(d.Name, d.GetValue(entity) ?? DBNull.Value);
+            });
+
+            string fields = string.Join(",", columnNameList);
+            string paras = string.Join(",", paraList);
+
+            sql += string.Format(@"{0})VALUES({1});", fields, paras);
+            sql += "SELECT SCOPE_IDENTITY();";
+
+            return Convert.ToInt32(this.ExecuteScalar(sql, paraDict));
         }
 
-        public bool UpdateEntity(Common.IEntity entity)
+        /// <summary>
+        /// 修改实体对象
+        /// </summary>
+        /// <typeparam name="T">待修改的对象类型</typeparam>
+        /// <param name="entity">待修改的对象</param>
+        /// <param name="UpdateFields">要修改的字段</param>
+        /// <returns></returns>
+        public bool UpdateEntity<T>(T entity, params string[] UpdateFields)
         {
-            throw new NotImplementedException();
+            if (UpdateFields.Length == 0)
+                return false;
+
+            Type tType = entity.GetType();
+            PropertyInfo[] propList = tType.GetProperties();
+            PropertyInfo keyProperty = propList.Where(d => d.GetCustomAttribute<Attributes.PrimaryKeyAttribute>(true) != null).FirstOrDefault();
+            if (keyProperty == null)
+                return false;
+            object primaryKeyValue = keyProperty.GetValue(entity);
+            if (primaryKeyValue == null)
+                return false;
+
+            Attributes.EntityMappingAttribute entityAttr = tType.GetCustomAttributes<Attributes.EntityMappingAttribute>(true).FirstOrDefault();
+            string tableName = entityAttr != null ? entityAttr.TableName : tType.Name;
+            string sql = string.Format(@"UPDATE {0} SET ", tableName);
+
+            string sqlQuery = string.Empty;
+            Dictionary<string, object> paraList = new Dictionary<string, object>();
+            foreach (var field in UpdateFields)
+            {
+                sqlQuery += string.Format(@",{0}=@{0}", field);
+                PropertyInfo prop = propList.Where(d => d.Name.Equals(field, StringComparison.CurrentCultureIgnoreCase)).FirstOrDefault();
+                object value = DBNull.Value;
+                if (prop != null)
+                    value = prop.GetValue(entity);
+                paraList.Add(field, value);
+            }
+            sql += sqlQuery.Substring(1) ?? string.Empty;
+            sql += string.Format(@" WHERE {0} = @{0}", keyProperty.Name);
+            paraList.Add(keyProperty.Name, primaryKeyValue);
+
+            return this.ExecuteNonQuery(sql, paraList) > 0;
         }
 
-        public bool DeleteEntity(Common.IEntity entity)
+        public bool DeleteEntity<T>(object primaryKey)
         {
-            throw new NotImplementedException();
+            Type tType = typeof(T);
+            PropertyInfo property = tType.GetProperties().Where(d => d.GetCustomAttributes<Attributes.PrimaryKeyAttribute>(true) != null).FirstOrDefault();
+            if (property == null)
+                return false;
+            Attributes.EntityMappingAttribute emAttr = tType.GetCustomAttributes<Attributes.EntityMappingAttribute>(true).FirstOrDefault();
+            string tableName = emAttr != null ? emAttr.TableName ?? tType.Name : tType.Name;
+
+            string sql = string.Format(@"DELETE FROM {0} WHERE {1} = @{1}", tableName, property.Name);
+            Dictionary<string, object> paraList = new Dictionary<string, object>();
+            paraList.Add(property.Name, primaryKey);
+
+            return ExecuteNonQuery(sql, paraList) > 0;
         }
 
 
@@ -374,7 +449,79 @@ namespace Rock.Framework.DataAccess
             reader.Close();
             return result;
         }
+
+        /// <summary>
+        /// 分页查询
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="pageIndex">页码</param>
+        /// <param name="pageSize">每页数据条数</param>
+        /// <param name="totalRecortCount">数据总条数</param>
+        /// <param name="filter">查询条件</param>
+        /// <param name="orderBy">排序</param>
+        /// <param name="para">查询条件使用的参数</param>
+        /// <returns>DataTable</returns>
+        public DataTable FindByFilter<T>(int pageIndex, int pageSize, out int totalRecortCount, string filter, string orderBy, object para) where T : new()
+        {
+            Type tType = typeof(T);
+            PropertyInfo[] propList = tType.GetProperties();
+            string[] columnList = propList.Select(d => d.Name).ToArray();
+            string fields = string.Join(",", columnList);           
+
+            string sql = SelectStatement.PagingSelectStatement(tType.Name, fields, pageIndex, pageSize, filter, orderBy);
+            SqlCommand cmd = new SqlCommand(sql, ROCKSqlConnection);
+            if (para != null)
+            {
+                ConvertCommandParameters(cmd.Parameters, para, true);
+            }
+            SqlDataAdapter sda = new SqlDataAdapter(cmd);
+            DataSet ds = new DataSet();
+            sda.Fill(ds);
+            totalRecortCount = Convert.ToInt32(ds.Tables[1].Rows[0][0]);
+            return ds.Tables[0];
+        }
+
+        /// <summary>
+        /// 分页查询
+        /// </summary>
+        /// <typeparam name="T">对象类型</typeparam>
+        /// <param name="pageIndex">页码</param>
+        /// <param name="pageSize">每页数据条数</param>
+        /// <param name="toatalRecordCount">数据总条数</param>
+        /// <param name="filter">查询条件</param>
+        /// <param name="orderBy">排序</param>
+        /// <param name="para">查询条件使用的参数</param>
+        /// <returns>T集合</returns>
+        public IEnumerable<T> Select<T>(int pageIndex, int pageSize, out int toatalRecordCount, string filter, string orderBy, object para) where T : new()
+        {
+            DataTable dt = FindByFilter<T>(pageIndex, pageSize, out toatalRecordCount, filter, orderBy, para);
+            List<T> ts = new List<T>();
+            string tempName = string.Empty;
+            foreach (DataRow row in dt.Rows)
+            {
+                T t = new T();
+                PropertyInfo[] propertys = t.GetType().GetProperties();
+
+                foreach (PropertyInfo pi in propertys)
+                {
+                    tempName = pi.Name;
+                    if (dt.Columns.Contains(tempName))
+                    {
+                        if (!pi.CanWrite)
+                            continue;
+                        object value = row[tempName];
+                        if (value != DBNull.Value)
+                            pi.SetValue(t, value, null);
+                    }
+                }
+                ts.Add(t);
+            }
+            return ts;
+        }
         #endregion
+
+
+
 
         /// <summary>
         /// 生成SqlCommand

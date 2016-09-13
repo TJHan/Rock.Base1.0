@@ -48,10 +48,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\EntityMappingAttribute.cs" />
+    <Compile Include="Attributes\PrimaryKeyAttribute.cs" />
     <Compile Include="Class1.cs" />
     <Compile Include="Common\IEntity.cs" />
     <Compile Include="DataAccess\IDbContext.cs" />
     <Compile Include="DataAccess\MSSqlContext.cs" />
+    <Compile Include="DataAccess\SelectStatement.cs" />
     <Compile Include="Entity\Entity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

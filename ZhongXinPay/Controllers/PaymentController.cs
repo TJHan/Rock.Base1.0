@@ -21,8 +21,9 @@ namespace ZhongXinPay.Controllers
         public ActionResult Index()
         {
             BaseDBContext db = new BaseDBContext(ConfigurationManager.ConnectionStrings["ROCKConnDebugPic"].ToString());
-            //db.ExecuteSQL("");
-            
+            //db.insertTest();
+            //db.UpdateTest();
+            db.PagingTest();
             return View();
         }
 
