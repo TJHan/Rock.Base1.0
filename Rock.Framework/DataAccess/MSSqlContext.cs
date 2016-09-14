@@ -330,16 +330,33 @@ namespace Rock.Framework.DataAccess
             return result;
         }
 
+        /// <summary>
+        /// 执行SQL命令，返回查询的第一行第一列的值
+        /// </summary>
+        /// <param name="sql">待执行的SQL语句</param>
+        /// <returns></returns>
         public object ExecuteScalar(string sql)
         {
             return this.ExecuteScalar(this.CreateSqlCommand(sql, null));
         }
 
+        /// <summary>
+        ///  执行SQL命令，返回查询的第一行第一列的值
+        /// </summary>
+        /// <param name="sql">待执行的SQL语句</param>
+        /// <param name="paramsList">查询条件</param>
+        /// <returns></returns>
         public object ExecuteScalar(string sql, params object[] paramsList)
         {
             return this.ExecuteScalar(this.CreateSqlCommand(sql, paramsList));
         }
 
+        /// <summary>
+        /// 执行SQL命令，返回查询的第一行第一列的值
+        /// </summary>
+        /// <param name="sql">待执行的SQL语句</param>
+        /// <param name="paramsList">查询条件</param>
+        /// <returns></returns>
         public object ExecuteScalar(string sql, object paramsList)
         {
             return this.ExecuteScalar(this.CreateSqlCommand(sql, paramsList));
