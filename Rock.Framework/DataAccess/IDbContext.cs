@@ -14,6 +14,7 @@ namespace Rock.Framework.DataAccess
         T FindEntity<T>(Guid guid, string keyColumnName) where T : new();
 
         int InsertEntity<T>(T entity);
+        bool UpdateEntity<T>(T entity);
         bool UpdateEntity<T>(T entity, params string[] UpdateFields);
         bool DeleteEntity<T>(object primaryKey);
 

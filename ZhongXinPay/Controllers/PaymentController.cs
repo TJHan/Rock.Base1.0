@@ -13,6 +13,7 @@ using System.Xml;
 using Rock.Base.DataAccess;
 using System.Configuration;
 using Rock.Base;
+using Rock.Base.Entity;
 namespace ZhongXinPay.Controllers
 {
     public class PaymentController : Controller
@@ -20,11 +21,14 @@ namespace ZhongXinPay.Controllers
         // GET: Payment
         public ActionResult Index()
         {
-            BaseDBContext db = new BaseDBContext(ConfigurationManager.ConnectionStrings["ROCKConnDebugPic"].ToString());
+            BaseDBContext db = new BaseDBContext(ConfigurationManager.ConnectionStrings["ROCKConnDebug"].ToString());
             //db.insertTest();
             //db.UpdateTest();
-            db.PagingTest();
-            return View();
+            
+            PaymentModel model = new PaymentModel();
+            //model.CustomerList = db.PagingTest();
+            model.OrderListList = db.TestFindByFilter();
+            return View(model);
         }
 
         public ActionResult Call()
@@ -84,5 +88,10 @@ namespace ZhongXinPay.Controllers
             var dd = xmlser.Deserialize(reader);
             return View((object)result);
         }
+    }
+    public class PaymentModel
+    {
+        public IEnumerable<Customer> CustomerList { get; set; }
+        public IEnumerable<orderList> OrderListList { get; set; }
     }
 }

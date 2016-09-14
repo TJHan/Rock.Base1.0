@@ -15,6 +15,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Rock.Framework.DataAccess
 {
+    /// <summary>
+    /// 数据库访问类
+    /// 本访问类的使用需要实体类做如下相关配合：
+    /// 1.主键字段必须添加特性 PrimaryKeyAttribute,并设置PrimaryKeyColumnName属性
+    /// 2.实体类以及属性可以使用特性EntityMappingAttribute，并给对应的字段赋值来设置对应的表名或字段名
+    /// </summary>
     public class MSSqlContext : DbContext, IDbContext
     {
         public SqlConnection ROCKSqlConnection
@@ -138,12 +144,13 @@ namespace Rock.Framework.DataAccess
         public T FindEntity<T>(int id, string keyColumnName) where T : new()
         {
             Type tType = typeof(T);
-            string sql = string.Format(@"SELECT * FROM {0} WHERE {1} = @p_key", tType.Name, keyColumnName);
+            string sql = string.Format(@"SELECT * FROM {0} WHERE {1} = @p_key", DBHelper.GetTableName(tType), keyColumnName);
             var para = new
             {
                 p_key = id
             };
-            return FindByFilter<T>(sql, para).FirstOrDefault();
+            IEnumerable<T> result = FindByFilter<T>(sql, para);
+            return result != null ? result.FirstOrDefault() : default(T);
         }
 
         /// <summary>
@@ -156,12 +163,13 @@ namespace Rock.Framework.DataAccess
         public T FindEntity<T>(Guid guid, string keyColumnName) where T : new()
         {
             Type tType = typeof(T);
-            string sql = string.Format(@"SELECT * FROM {0} WHERE {1} = @p_key", tType.Name, keyColumnName);
+            string sql = string.Format(@"SELECT * FROM {0} WHERE {1} = @p_key", DBHelper.GetTableName(tType), keyColumnName);
             var para = new
             {
                 p_key = guid
             };
-            return FindByFilter<T>(sql, para).FirstOrDefault();
+            IEnumerable<T> result = FindByFilter<T>(sql, para);
+            return result != null ? result.FirstOrDefault() : default(T);
         }
 
         /// <summary>
@@ -175,15 +183,15 @@ namespace Rock.Framework.DataAccess
             Type tType = entity.GetType();
             PropertyInfo[] propList = tType.GetProperties();
 
-            string sql = string.Format(@"INSERT INTO {0} (", tType.Name);
+            string sql = string.Format(@"INSERT INTO {0} (", DBHelper.GetTableName(tType));
             propList = propList.Where(d => d.GetCustomAttribute<Attributes.PrimaryKeyAttribute>(true) == null).ToArray();
-            string[] columnNameList = propList.Select(p => p.Name).ToArray();
-            string[] paraList = propList.Select(p => string.Format(@"@{0}", p.Name)).ToArray();
+            string[] columnNameList = propList.Select(p => DBHelper.GetTableColumnName(p)).ToArray();
+            string[] paraList = propList.Select(p => string.Format(@"@{0}", DBHelper.GetTableColumnName(p))).ToArray();
             Dictionary<string, object> paraDict = new Dictionary<string, object>();
 
             propList.ToList().ForEach(d =>
             {
-                paraDict.Add(d.Name, d.GetValue(entity) ?? DBNull.Value);
+                paraDict.Add(DBHelper.GetTableColumnName(d), d.GetValue(entity) ?? DBNull.Value);
             });
 
             string fields = string.Join(",", columnNameList);
@@ -196,7 +204,22 @@ namespace Rock.Framework.DataAccess
         }
 
         /// <summary>
-        /// 修改实体对象
+        /// 修改对象所有字段的数据
+        /// </summary>
+        /// <typeparam name="T">对象类型</typeparam>
+        /// <param name="entity">待修改的对象</param>
+        /// <returns></returns>
+        public bool UpdateEntity<T>(T entity)
+        {
+            Type tType = entity.GetType();
+            //获取对象的除去主键字段的其他所有需要修改的字段
+            PropertyInfo[] propList = tType.GetProperties().Where(d => d.GetCustomAttribute<Attributes.PrimaryKeyAttribute>(true) == null).ToArray();
+            string[] columnList = propList.Select(d => DBHelper.GetTableColumnName(d)).ToArray();
+            return this.UpdateEntity<T>(entity, columnList);
+        }
+
+        /// <summary>
+        /// 修改对象数据
         /// </summary>
         /// <typeparam name="T">待修改的对象类型</typeparam>
         /// <param name="entity">待修改的对象</param>
@@ -215,9 +238,9 @@ namespace Rock.Framework.DataAccess
             object primaryKeyValue = keyProperty.GetValue(entity);
             if (primaryKeyValue == null)
                 return false;
+            string primaryKeyName = DBHelper.GetTableColumnName(keyProperty);
 
-            Attributes.EntityMappingAttribute entityAttr = tType.GetCustomAttributes<Attributes.EntityMappingAttribute>(true).FirstOrDefault();
-            string tableName = entityAttr != null ? entityAttr.TableName : tType.Name;
+            string tableName = DBHelper.GetTableName(tType);
             string sql = string.Format(@"UPDATE {0} SET ", tableName);
 
             string sqlQuery = string.Empty;
@@ -225,31 +248,37 @@ namespace Rock.Framework.DataAccess
             foreach (var field in UpdateFields)
             {
                 sqlQuery += string.Format(@",{0}=@{0}", field);
-                PropertyInfo prop = propList.Where(d => d.Name.Equals(field, StringComparison.CurrentCultureIgnoreCase)).FirstOrDefault();
+                PropertyInfo prop = propList.Where(d => DBHelper.GetTableColumnName(d).Equals(field, StringComparison.CurrentCultureIgnoreCase)).FirstOrDefault();
                 object value = DBNull.Value;
                 if (prop != null)
                     value = prop.GetValue(entity);
                 paraList.Add(field, value);
             }
             sql += sqlQuery.Substring(1) ?? string.Empty;
-            sql += string.Format(@" WHERE {0} = @{0}", keyProperty.Name);
-            paraList.Add(keyProperty.Name, primaryKeyValue);
+            sql += string.Format(@" WHERE {0} = @{0}", primaryKeyName);
+            paraList.Add(primaryKeyName, primaryKeyValue);
 
             return this.ExecuteNonQuery(sql, paraList) > 0;
         }
 
+        /// <summary>
+        /// 删除对象数据
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="primaryKey"></param>
+        /// <returns></returns>
         public bool DeleteEntity<T>(object primaryKey)
         {
             Type tType = typeof(T);
             PropertyInfo property = tType.GetProperties().Where(d => d.GetCustomAttributes<Attributes.PrimaryKeyAttribute>(true) != null).FirstOrDefault();
             if (property == null)
                 return false;
-            Attributes.EntityMappingAttribute emAttr = tType.GetCustomAttributes<Attributes.EntityMappingAttribute>(true).FirstOrDefault();
-            string tableName = emAttr != null ? emAttr.TableName ?? tType.Name : tType.Name;
 
-            string sql = string.Format(@"DELETE FROM {0} WHERE {1} = @{1}", tableName, property.Name);
+            string tableName = DBHelper.GetTableName(tType);
+            string primaryKeyName = DBHelper.GetTableColumnName(property);
+            string sql = string.Format(@"DELETE FROM {0} WHERE {1} = @{1}", tableName, primaryKeyName);
             Dictionary<string, object> paraList = new Dictionary<string, object>();
-            paraList.Add(property.Name, primaryKey);
+            paraList.Add(primaryKeyName, primaryKey);
 
             return ExecuteNonQuery(sql, paraList) > 0;
         }
@@ -348,17 +377,24 @@ namespace Rock.Framework.DataAccess
 
         public System.Data.SqlClient.SqlDataReader ExecuteReader(string sql)
         {
-            throw new NotImplementedException();
+            return this.ExecuteReader(CreateSqlCommand(sql, null));
         }
 
         public System.Data.SqlClient.SqlDataReader ExecuteReader(SqlCommand cmd)
         {
-            throw new NotImplementedException();
+            return cmd.ExecuteReader();
         }
         #endregion
 
         #region 查询函数
 
+        /// <summary>
+        /// 根据SQL语句查询出T集合
+        /// </summary>
+        /// <typeparam name="T">集合对象类型</typeparam>
+        /// <param name="sql">sql语句</param>
+        /// <param name="para">查询条件</param>
+        /// <returns></returns>
         public IEnumerable<T> FindByFilter<T>(string sql, object para = null) where T : new()
         {
             return FindByFilter<T>(CreateSqlCommand(sql, para));
@@ -400,15 +436,15 @@ namespace Rock.Framework.DataAccess
             {
                 Type tType = typeof(T);
                 PropertyInfo[] tPropList = tType.GetProperties();
-                //IEnumerable<PropertyInfo> cfpropList = tPropList.Where(d => d.GetCustomAttributes<ColumnAttribute>().Any());
 
                 Dictionary<string, PropertyInfo> propDict = new Dictionary<string, PropertyInfo>();
                 foreach (var item in tPropList)
                 {
-                    if (propDict.ContainsKey(item.Name))
-                        propDict[item.Name] = item;
+                    string propName = DBHelper.GetTableColumnName(item);
+                    if (propDict.ContainsKey(propName))
+                        propDict[propName] = item;
                     else
-                        propDict.Add(item.Name, item);
+                        propDict.Add(propName, item);
                 }
 
                 while (reader.Read())
@@ -465,15 +501,24 @@ namespace Rock.Framework.DataAccess
         {
             Type tType = typeof(T);
             PropertyInfo[] propList = tType.GetProperties();
-            string[] columnList = propList.Select(d => d.Name).ToArray();
-            string fields = string.Join(",", columnList);           
-
-            string sql = SelectStatement.PagingSelectStatement(tType.Name, fields, pageIndex, pageSize, filter, orderBy);
+            string[] columnList = propList.Select(d => DBHelper.GetTableColumnName(d)).ToArray();
+            string fields = string.Join(",", columnList);
+            PropertyInfo primaryKeyColumn = propList.Where(d => d.GetCustomAttribute<Attributes.PrimaryKeyAttribute>(true) != null).FirstOrDefault();
+            string primaryKeyName = propList[0].Name;
+            primaryKeyName = primaryKeyColumn != null ? DBHelper.GetTableColumnName(primaryKeyColumn) : primaryKeyName;
+            string sql = SelectStatement.PagingSelectStatement(tType.Name, primaryKeyName, fields, pageIndex, pageSize, filter, orderBy);
             SqlCommand cmd = new SqlCommand(sql, ROCKSqlConnection);
             if (para != null)
             {
                 ConvertCommandParameters(cmd.Parameters, para, true);
             }
+
+            if (this.Database.Connection.State != ConnectionState.Open)
+                this.Open();
+            if (this.Database.CommandTimeout.HasValue)
+                cmd.CommandTimeout = this.Database.CommandTimeout.Value;
+            if (IsTransaction)
+                cmd.Transaction = this.ROCKSqlTransaction;
             SqlDataAdapter sda = new SqlDataAdapter(cmd);
             DataSet ds = new DataSet();
             sda.Fill(ds);
@@ -504,7 +549,7 @@ namespace Rock.Framework.DataAccess
 
                 foreach (PropertyInfo pi in propertys)
                 {
-                    tempName = pi.Name;
+                    tempName = DBHelper.GetTableColumnName(pi);
                     if (dt.Columns.Contains(tempName))
                     {
                         if (!pi.CanWrite)
@@ -519,9 +564,6 @@ namespace Rock.Framework.DataAccess
             return ts;
         }
         #endregion
-
-
-
 
         /// <summary>
         /// 生成SqlCommand
@@ -588,8 +630,6 @@ namespace Rock.Framework.DataAccess
                 sqlParaCo.Add(item.Key, value);
             }
         }
-
-
 
     }
 }

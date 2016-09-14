@@ -43,17 +43,22 @@ namespace Rock.Base.DataAccess
 
         }
 
-        public void TestFindByFilter()
+        public IEnumerable<Entity.orderList> TestFindByFilter()
         {
-            IEnumerable<Entity.Customer> list = FindByFilter<Entity.Customer>("SELECT e_guid,e_realname FROM t_enterprise WHERE e_id<100");
-            if (list != null)
-            { }
+            var par = new
+            {
+                p_id = 40000
+            };
+            IEnumerable<Entity.orderList> list = FindByFilter<Entity.orderList>(@"select o_guid,o_code,e.e_realname from t_orders o
+                                                                    left join t_enterprise e on o.o_ownid = e.e_guid WHERE o.o_id>@p_id", par);
+
+            return list;
         }
 
         public void insertTest()
         {
             Entity.Customer entity = new Entity.Customer();
-            entity.CustomerName = "张先生";
+            entity.CustomerNames = "张先生";
             entity.EnteredDate = DateTime.Now;
             entity.CustomerPhone = "000000111";
 
@@ -65,10 +70,10 @@ namespace Rock.Base.DataAccess
         public void UpdateTest()
         {
             Entity.Customer entity = new Entity.Customer();
-            entity.CustomerID = 1;
-            entity.CustomerName = "新的名字";
-            entity.UpdateDate = DateTime.Now;
-            bool result = this.UpdateEntity<Entity.Customer>(entity, "customername", "updatedate");
+            entity = this.FindEntity<Entity.Customer>(1, "customerID");            
+            entity.CustomerNames = "新的名字22";
+            entity.UpdateDate = DateTime.Now;            
+            bool result = this.UpdateEntity<Entity.Customer>(entity);
             if (result)
             { }
         }
@@ -80,18 +85,18 @@ namespace Rock.Base.DataAccess
             { }
         }
 
-        public void PagingTest()
+        public IEnumerable<Entity.Customer> PagingTest()
         {
             int total = 0;
-            string orderby = " customername desc";
-            string filter = " customerName like @p_name";
+            string orderby = "";
+            string filter = "";
             var para = new
             {
-                p_name = ""
+                p_name = "asdfddd"
             };
             IEnumerable<Entity.Customer> list = this.Select<Entity.Customer>(1, 5, out total, filter, orderby, para);
-            if (list.ToList().Count > 0)
-            { }
+
+            return list;
 
         }
     }

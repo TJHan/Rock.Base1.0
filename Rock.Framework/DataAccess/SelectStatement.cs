@@ -11,7 +11,18 @@ namespace Rock.Framework.DataAccess
         public SelectStatement()
         { }
 
-        public static string PagingSelectStatement(string tableName, string fields, int pageIndex, int pageSize, string filter, string orderBy)
+        /// <summary>
+        /// 编辑分页查询语句
+        /// </summary>
+        /// <param name="tableName">表名</param>
+        /// <param name="primaryColumnName"></param>
+        /// <param name="fields"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="filter"></param>
+        /// <param name="orderBy"></param>
+        /// <returns></returns>
+        public static string PagingSelectStatement(string tableName,string primaryColumnName, string fields, int pageIndex, int pageSize, string filter, string orderBy)
         {
             string whereStr = string.IsNullOrEmpty(filter) ? string.Empty : string.Format(@"WHERE {0}", filter);
             string sql = string.Format(@"WITH PagingTable AS(
@@ -21,7 +32,7 @@ namespace Rock.Framework.DataAccess
                                 SELECT COUNT(*) FROM {0} {1};", tableName
                                                               , whereStr
                                                               , fields
-                                                              , string.IsNullOrEmpty(orderBy) ? "1" : orderBy
+                                                              , string.IsNullOrEmpty(orderBy) ? primaryColumnName : orderBy
                                                               , pageIndex * pageSize
                                                               , pageSize * (pageIndex - 1));
             return sql;

@@ -1,0 +1,64 @@
+﻿@model ZhongXinPay.Controllers.PaymentModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+</head>
+<body>
+    <div>
+        <table>
+            @{
+                if (Model != null)
+                {
+                    if (Model.CustomerList != null)
+                    {
+                        foreach (var item in Model.CustomerList)
+                        {
+                            <tr>
+                                <td>
+                                    @item.CustomerNames
+                                </td>
+                                <td>
+                                    @item.CustomerID
+                                </td>
+                            </tr>
+                        }
+
+                    }
+                }
+            }
+
+        </table>
+
+        <table>
+            @{
+                if (Model != null)
+                {
+
+                    if (Model.OrderListList != null)
+                    {
+                        foreach (var item in Model.OrderListList)
+                        {
+                            <tr>
+                                <td>
+                                    @item.UserName
+                                </td>
+                                <td>
+                                    @item.o_code
+                                </td>
+                            </tr>
+                        }
+                    }
+                }
+            }
+        </table>
+    </div>
+</body>
+</html>

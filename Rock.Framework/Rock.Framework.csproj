@@ -52,6 +52,7 @@
     <Compile Include="Attributes\PrimaryKeyAttribute.cs" />
     <Compile Include="Class1.cs" />
     <Compile Include="Common\IEntity.cs" />
+    <Compile Include="DataAccess\DBHelper.cs" />
     <Compile Include="DataAccess\IDbContext.cs" />
     <Compile Include="DataAccess\MSSqlContext.cs" />
     <Compile Include="DataAccess\SelectStatement.cs" />

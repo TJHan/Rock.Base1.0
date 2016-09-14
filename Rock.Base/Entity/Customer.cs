@@ -13,9 +13,20 @@ namespace Rock.Base.Entity
     {
         [PrimaryKey(PrimaryKeyColumnName = "CustomerID")]
         public int CustomerID { get; set; }
-        public string CustomerName { get; set; }
+
+        [EntityMapping(ColumnName = "CustomerName")]
+        public string CustomerNames { get; set; }
         public string CustomerPhone { get; set; }
         public DateTime EnteredDate { get; set; }
         public Nullable<DateTime> UpdateDate { get; set; }
+    }
+        
+    public class orderList
+    {
+        public Guid o_guid { get; set; }
+        public string o_code { get; set; }
+
+        [EntityMapping(ColumnName = "e_realname")]
+        public string UserName { get; set; }
     }
 }
